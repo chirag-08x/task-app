@@ -8,8 +8,11 @@ const {
   deleteAllUsers,
   loginUser,
 } = require("../controllers/userController");
+const auth = require("../middleware/auth");
 
 const userRouter = express.Router();
+
+userRouter.route("/me").get(auth, getUsers);
 
 userRouter
   .route("/:id")
@@ -17,7 +20,7 @@ userRouter
   .patch(updateUser)
   .delete(deleteUser);
 
-userRouter.route("/").get(getUsers).post(createUser).delete(deleteAllUsers);
+userRouter.route("/").post(createUser).delete(deleteAllUsers);
 
 userRouter.route("/login").post(loginUser);
 
