@@ -7,6 +7,8 @@ const {
   deleteUser,
   deleteAllUsers,
   loginUser,
+  logout,
+  logoutAll,
 } = require("../controllers/userController");
 const auth = require("../middleware/auth");
 
@@ -23,5 +25,7 @@ userRouter
 userRouter.route("/").post(createUser).delete(deleteAllUsers);
 
 userRouter.route("/login").post(loginUser);
+userRouter.route("/logout").post(auth, logout);
+userRouter.route("/logout/all").post(auth, logoutAll);
 
 module.exports = userRouter;

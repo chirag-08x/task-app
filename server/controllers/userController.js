@@ -119,6 +119,35 @@ const loginUser = async (req, res) => {
   }
 };
 
+const logout = async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter((token) => {
+      return token.token !== req.token;
+    });
+
+    await req.user.save();
+    res.send();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const logoutAll = async (req, res) => {
+  try {
+    req.user.tokens = [];
+    await req.user.save();
+    res.send();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getUsers,
   getSingleUsers,
@@ -127,6 +156,8 @@ module.exports = {
   deleteUser,
   deleteAllUsers,
   loginUser,
+  logout,
+  logoutAll,
 };
 
 // Won't use this method in production since we don't want to produce a list of all users to the client.
