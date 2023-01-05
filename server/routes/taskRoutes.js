@@ -8,8 +8,9 @@ const {
 } = require("../controllers/taskController");
 
 const taskRouter = express.Router();
+const auth = require("../middleware/auth");
 
-taskRouter.route("/").get(getTasks).post(createTask);
+taskRouter.route("/").get(getTasks).post(auth, createTask);
 taskRouter
   .route("/:id")
   .get(getSingleTask)

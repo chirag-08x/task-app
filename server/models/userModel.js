@@ -38,6 +38,24 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+// Virtuals
+userSchema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "owner",
+});
+
+// Select Fields to send.
+userSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
+
+  delete userObject.password;
+  delete userObject.tokens;
+
+  return userObject;
+};
+
 // Generate Auth Token = method on Instance
 userSchema.methods.generateAuthToken = async function () {
   const user = this;

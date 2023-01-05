@@ -1,11 +1,9 @@
 const express = require("express");
 const {
   getUsers,
-  getSingleUsers,
   createUser,
   updateUser,
   deleteUser,
-  deleteAllUsers,
   loginUser,
   logout,
   logoutAll,
@@ -14,15 +12,13 @@ const auth = require("../middleware/auth");
 
 const userRouter = express.Router();
 
-userRouter.route("/me").get(auth, getUsers);
-
 userRouter
-  .route("/:id")
-  .get(getSingleUsers)
-  .patch(updateUser)
-  .delete(deleteUser);
+  .route("/me")
+  .get(auth, getUsers)
+  .delete(auth, deleteUser)
+  .patch(auth, updateUser);
 
-userRouter.route("/").post(createUser).delete(deleteAllUsers);
+userRouter.route("/").post(createUser);
 
 userRouter.route("/login").post(loginUser);
 userRouter.route("/logout").post(auth, logout);
