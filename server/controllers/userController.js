@@ -22,12 +22,30 @@ const getUsers = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["name", "email", "password"];
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+
+  if (!isValidOperation) {
+    return res.status(400).send({
+      success: false,
+      message: "Invalid Operation",
+    });
+  }
+
   try {
-    for (const key in req.user) {
-      if (key in req.body) {
-        req.user[key] = req.body[key];
-      }
-    }
+    // for (const key in req.user) {
+    //   if (key in req.body) {
+    //     req.user[key] = req.body[key];
+    //   }
+    // }
+
+    updates.forEach((update) => {
+      req.user[update] = req.body[update];
+    });
+
     await req.user.save();
 
     res.status(200).json({

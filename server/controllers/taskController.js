@@ -21,11 +21,18 @@ const createTask = async (req, res) => {
 
 const getTasks = async (req, res) => {
   try {
-    const allTasks = await Task.find();
+    // Method - 1
+    const allTasks = await Task.find({
+      owner: req.user._id,
+    });
+
+    // Method - 2 (Populate Tasks)
+    await req.user.populate("tasks");
+
     res.status(200).json({
       success: true,
-      results: allTasks.length,
-      data: allTasks,
+      results: req.user.tasks.length,
+      data: req.user.tasks,
     });
   } catch (error) {
     res.send(error);
@@ -34,7 +41,11 @@ const getTasks = async (req, res) => {
 
 const getSingleTask = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id,
+    });
+
     if (!task) {
       return res.status(404).json({
         success: false,
@@ -55,10 +66,23 @@ const getSingleTask = async (req, res) => {
 };
 
 const updateTask = async (req, res) => {
+  const allowedUpdates = ["taskname", "completed"];
+  const updates = Object.keys(req.body);
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+
+  if (!isValidOperation) {
+    return res.status(400).send({
+      success: false,
+      message: "Invalid Operation",
+    });
+  }
+
   try {
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id,
     });
 
     if (!task) {
@@ -68,6 +92,12 @@ const updateTask = async (req, res) => {
         data: [],
       });
     }
+
+    updates.forEach((update) => {
+      task[update] = req.body[update];
+    });
+
+    await task.save();
 
     res.status(200).json({
       success: true,
@@ -83,7 +113,10 @@ const updateTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user._id,
+    });
 
     if (!task) {
       return res.status(404).json({
