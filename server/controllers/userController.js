@@ -36,12 +36,6 @@ const updateUser = async (req, res) => {
   }
 
   try {
-    // for (const key in req.user) {
-    //   if (key in req.body) {
-    //     req.user[key] = req.body[key];
-    //   }
-    // }
-
     updates.forEach((update) => {
       req.user[update] = req.body[update];
     });
